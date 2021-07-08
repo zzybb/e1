@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="./mvvm/MVVM.js"></script>
+    <style>
+        #content {
+            width: 300px;
+            height: 50px;
+        }
+
+        #box {
+            width: 150px;
+            height: 50px;
+            border: 1px grey solid;
+            backgroundColor:red;
+        }
+
+        #edit-body{
+            display: flex;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="content">
+        <div id="edit-body" >
+            <td contenteditable="true" id="box" @input="getValue" >
+            </td>
+            <div contenteditable="true" id="box">
+
+            </div>
+        </div>
+        {{ inputValue }}
+    </div>
+    
+    <script>
+        let vm = new MVVM({
+            el: '#content',
+            data() {
+                return {
+                    inputValue: ''
+                }
+            },
+            methods:{
+                getValue(e){
+                    console.log("555",e)
+
+                }
+            }
+        })
+        const targetNode = document.getElementById('edit-body');
+
+        // 观察器的配置（需要观察什么变动）
+        const config = {
+            subtree: true,
+            characterData: true
+        };
+
+        // 当观察到变动时执行的回调函数
+        const callback = function (mutationsList, observer) {
+            console.log(1)
+            // Use traditional 'for loops' for IE 11
+            for (let mutation of mutationsList) {
+
+                if (mutation.type === 'characterData') {
+                    vm.inputValue = mutation.target.data;
+                }
+            }
+        };
+
+        // 创建一个观察器实例并传入回调函数
+        const observer = new MutationObserver(callback);
+
+        // 以上述配置开始观察目标节点
+        observer.observe(targetNode, config);
+    </script>
+</body>
+
+</html>
